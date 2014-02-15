@@ -72,6 +72,10 @@ td-dvb-wrapper: $(SOURCE_DIR)/td-dvb-wrapper $(D)/tdkernel
 		make ARCH=ppc CROSS_COMPILE=powerpc-405-linux-gnu- M=$(SOURCE_DIR)/td-dvb-wrapper ;\
 		make ARCH=ppc CROSS_COMPILE=powerpc-405-linux-gnu- M=$(SOURCE_DIR)/td-dvb-wrapper \
 			INSTALL_MOD_PATH=$(TARGETPREFIX)/mymodules modules_install
+	# hack: put the frontend.h into a place where it will be found but which
+	# does not conflict with system headers.
+	install -d $(TARGETPREFIX)/include/hardware/linux/dvb
+	cp -a $(SOURCE_DIR)/td-dvb-wrapper/frontend.h $(TARGETPREFIX)/include/hardware/linux/dvb/
 
 $(TARGET_MODULE)/extra/td-dvb-frontend.ko: td-dvb-wrapper
 	install -m 644 -D $(SOURCE_MODULE)/extra/td-dvb-frontend.ko $@
