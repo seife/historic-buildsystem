@@ -24,25 +24,21 @@ crosstool-old: | $(SOURCE_DIR)/svn/CROSSENVIROMENT/crosstool-ng-1.3.2 $(SOURCE_D
 		./configure --local; make; chmod 0755 ct-ng; \
 		./ct-ng oldconfig; ./ct-ng build.2
 
-UNCOOL_CT_VER = 1.16.0
-crosstool-new: $(ARCHIVE)/crosstool-ng-$(UNCOOL_CT_VER).tar.bz2 $(ARCHIVE)/linux-2.6.26.8.tar.bz2
+UNCOOL_CT_VER = 1.19.0
+crosstool-new: $(ARCHIVE)/crosstool-ng-$(UNCOOL_CT_VER).tar.bz2 $(ARCHIVE)/linux-2.6.34.13.tar.xz
 	make $(BUILD_TMP)
 	$(REMOVE)/crosstool-ng-$(UNCOOL_CT_VER)
 	$(UNTAR)/crosstool-ng-$(UNCOOL_CT_VER).tar.bz2
-	set -e; unset CONFIG_SITE LD_LIBRARY_PATH; cd $(BUILD_TMP)/crosstool-ng-$(UNCOOL_CT_VER); \
+	set -e; unset CONFIG_SITE LD_LIBRARY_PATH; \
+		if [ x`make --version | awk '/^GNU Make/{print int($$3)}'` != x3 ]; then \
+			make $(BUILD_TMP)/bin/gmake; \
+			export PATH=$(BUILD_TMP)/bin:$$PATH; \
+		fi; \
+		cd $(BUILD_TMP)/crosstool-ng-$(UNCOOL_CT_VER); \
 		cp $(PATCHES)/999-ppl-0_11_2-fix-configure-for-64bit-host.patch patches/ppl/0.11.2; \
-		test "$(GIT_PROTOCOL)" = http && \
-			sed -i 's#svn://svn.eglibc.org#http://www.eglibc.org/svn#' \
-				scripts/build/libc/eglibc.sh || \
-			true; \
-		mkdir -p targets/src/; \
-		tar -C targets/src/ -xf $(ARCHIVE)/linux-2.6.26.8.tar.bz2; \
-		(cd targets/src/linux-2.6.26.8 && \
-			patch -p1 -i $(PATCHES)/linux-2.6.26.8-new-make.patch && \
-			patch -p1 -i $(PATCHES)/linux-2.6.26.8-rename-getline.patch); \
-		ln -sf linux-2.6.26.8 targets/src/linux-custom; \
-		touch targets/src/.linux-custom.extracted; \
 		cp -a $(PATCHES)/crosstool-ng-coolstreamnew.config .config; \
+		test "$(GIT_PROTOCOL)" = http && \
+			sed -i 's/^.*CT_EGLIBC_HTTP.*/CT_EGLIBC_HTTP=y/' .config || true; \
 		NUM_CPUS=$$(expr `getconf _NPROCESSORS_ONLN` \* 2); \
 		MEM_512M=$$(awk '/MemTotal/ {M=int($$2/1024/512); print M==0?1:M}' /proc/meminfo); \
 		test $$NUM_CPUS -gt $$MEM_512M && NUM_CPUS=$$MEM_512M; \

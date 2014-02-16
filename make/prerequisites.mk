@@ -129,6 +129,16 @@ toolcheck: $(TOOLCHECK)
 		echo; \
 	fi
 
+# this is a hack: old glibcs check make version and bail out if it does not start with "3."
+# so add a wrapper that pretends to be gmake 3.82, the PATH will only be added for crosstool
+# builds
+$(BUILD_TMP)/bin/gmake:
+	rm -fr $(BUILD_TMP)/bin
+	mkdir $(BUILD_TMP)/bin
+	printf '#!/bin/sh\nif [ x"$$1" = x--version ];then echo "GNU Make 3.82";exit 0; fi\n' > $@
+	echo "exec `which gmake` \$$*" >> $@
+	chmod 755 $@
+
 neutrino-source: $(N_HD_SOURCE)
 cs-sources: $(UNCOOL_LIBS) $(UNCOOL_DRIVER)
 # $(SOURCE_DIR)/svn/CROSSENVIROMENT/coolstream $(SOURCE_DIR)/svn/THIRDPARTY/lib
