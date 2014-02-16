@@ -198,11 +198,12 @@ update-uncool:
 		done
 	if test -d $(UNCOOL_GIT)/cst-public-libraries-ffmpeg; then \
 		cd $(UNCOOL_GIT)/cst-public-libraries-ffmpeg; \
-		if [ x"`git rev-parse --abbrev-ref HEAD`" != xcoolstream ]; then \
-			if [ x"`git branch --list coolstream`" = xcoolstream ]; then \
-				git checkout coolstream; \
+		if [ x"`git rev-parse --abbrev-ref HEAD`" != xmaster ]; then \
+			X=`git branch --list master`; \
+			if [ x`echo $$X` = xmaster ]; then \
+				git checkout master; \
 			else \
-				git checkout -b coolstream origin/coolstream; \
+				git checkout -b master origin/master; \
 			fi; \
 		fi; \
 	fi
