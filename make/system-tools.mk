@@ -68,8 +68,10 @@ $(D)/busybox-$(BUSYBOX_VER): $(ARCHIVE)/busybox-$(BUSYBOX_VER).tar.bz2 | $(TARGE
 		$(PATCH)/busybox-$(BUSYBOX_VER)-revert-broken-sighandling.patch; \
 		$(PATCH)/busybox-$(BUSYBOX_VER)-mdev-firmware-loading.diff; \
 		$(PATCH)/busybox-$(BUSYBOX_VER)-mdev-increase-timeout.diff; \
-		test x"$(BUSYBOX_VER)" = x1.21.1 && \
-			$(PATCH)/busybox-1.21.1-udhcpcp-fix-old-kernel.diff || true; \
+		test x"$(BUSYBOX_VER)" = x1.21.1 && { \
+			$(PATCH)/busybox-1.21.1-udhcpcp-fix-old-kernel.diff; \
+			$(PATCH)/busybox-1.21.1-reorder-scanning.diff; \
+			} || true; \
 		test -e $(PATCHES)/busybox-$(BUSYBOX_REL).config.$(PLATFORM) && \
 			cp $(PATCHES)/busybox-$(BUSYBOX_REL).config.$(PLATFORM) .config || \
 			cp $(PATCHES)/busybox-$(BUSYBOX_REL).config .config; \

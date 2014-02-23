@@ -1,0 +1,24 @@
+diff --git a/util-linux/mdev.c b/util-linux/mdev.c
+index d7269ca..9d4e9ad 100644
+--- a/util-linux/mdev.c
++++ b/util-linux/mdev.c
+@@ -1080,6 +1080,9 @@ int mdev_main(int argc UNUSED_PARAM, char **argv)
+ 		 * (kernel's CONFIG_SYSFS_DEPRECATED makes them real dirs,
+ 		 * but we can't enforce that on users)
+ 		 */
++		recursive_action("/sys/class",
++			ACTION_RECURSE | ACTION_FOLLOWLINKS,
++			fileAction, dirAction, temp, 0);
+ 		if (access("/sys/class/block", F_OK) != 0) {
+ 			/* Scan obsolete /sys/block only if /sys/class/block
+ 			 * doesn't exist. Otherwise we'll have dupes.
+@@ -1090,9 +1093,6 @@ int mdev_main(int argc UNUSED_PARAM, char **argv)
+ 				ACTION_RECURSE | ACTION_FOLLOWLINKS | ACTION_QUIET,
+ 				fileAction, dirAction, temp, 0);
+ 		}
+-		recursive_action("/sys/class",
+-			ACTION_RECURSE | ACTION_FOLLOWLINKS,
+-			fileAction, dirAction, temp, 0);
+ 	} else {
+ 		char *fw;
+ 		char *seq;
