@@ -65,7 +65,7 @@ OPENSSL_VER=0.9.8
 OPENSSL_SUBVER=q
 
 # libffmpeg; complete, cross-platform solution to record, convert and stream audio and video
-FFMPEG_VER=2.0.2
+FFMPEG_VER=2.1.3
 ifeq ($(PLATFORM), coolstream)
 FFMPEG_VER=1.2
 endif
