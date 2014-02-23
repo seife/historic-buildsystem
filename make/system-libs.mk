@@ -275,6 +275,23 @@ $(D)/openssl: $(ARCHIVE)/openssl-$(OPENSSL_VER)$(OPENSSL_SUBVER).tar.gz | $(TARG
 	rm -rf $(PKGPREFIX)
 	touch $@
 
+libbluray: $(TARGETPREFIX)/lib/libbluray.so
+$(TARGETPREFIX)/lib/libbluray.so: $(ARCHIVE)/libbluray-$(LIBBLURAY_VER).tar.bz2 | $(TARGETPREFIX)
+	$(UNTAR)/libbluray-$(LIBBLURAY_VER).tar.bz2
+	set -e; cd $(BUILD_TMP)/libbluray-$(LIBBLURAY_VER); \
+		$(PATCH)/0001-Optimized-file-I-O-for-chained-usage-with-libavforma.patch; \
+		$(PATCH)/0002-Added-bd_get_clip_infos.patch; \
+		$(PATCH)/0003-Don-t-abort-demuxing-if-the-disc-looks-encrypted.patch; \
+		$(CONFIGURE) --prefix= \
+			--without-libxml2 \
+			--without-freetype \
+			--disable-examples \
+			; \
+		$(MAKE); \
+		make install DESTDIR=$(TARGETPREFIX); \
+	$(REWRITE_PKGCONF) $(PKG_CONFIG_PATH)/libbluray.pc
+	$(REMOVE)/libbluray-0.5.0
+
 ifeq ($(BOXARCH), arm)
 FFMPEG_CONFIGURE  = --arch=arm --cpu=armv6 --disable-neon
 FFMPEG_CONFIGURE += --disable-decoders --disable-parsers --disable-demuxers
@@ -296,6 +313,7 @@ FFMPEG_CONFIGURE += --enable-network --enable-protocol=http
 FFMPEG_CONFIGURE += --enable-demuxer=rtsp
 FFMPEG_CONFIGURE += --enable-protocol=rtmp --enable-protocol=rtmpe --enable-protocol=rtmps --enable-protocol=rtmpte --enable-protocol=rtp
 FFMPEG_CONFIGURE += --enable-bsfs
+FFMPEG_CONFIGURE += --enable-libbluray --enable-protocol=bluray
 endif
 ifeq ($(BOXARCH), powerpc)
 FFMPEG_CONFIGURE  = --arch=ppc
@@ -328,6 +346,7 @@ $(D)/ffmpeg: $(D)/ffmpeg-$(FFMPEG_VER)
 	touch $@
 $(D)/ffmpeg-$(FFMPEG_VER): $(ARCHIVE)/ffmpeg-$(FFMPEG_VER).tar.bz2 | $(TARGETPREFIX)
 ifeq ($(PLATFORM), coolstream)
+	$(MAKE) $(TARGETPREFIX)/lib/libbluray.so
 	if ! test -d $(UNCOOL_GIT)/cst-public-libraries-ffmpeg; then \
 		make $(UNCOOL_GIT)/cst-public-libraries-ffmpeg; \
 	fi
@@ -353,8 +372,10 @@ endif
 			--enable-cross-compile \
 			--cross-prefix=$(TARGET)- \
 			--target-os=linux \
-			--enable-debug --enable-stripping \
+			--enable-debug \
 			--disable-doc \
+			--extra-cflags="$(TARGET_CFLAGS)" \
+			--extra-ldflags="$(TARGET_LDFLAGS) `pkg-config --libs libbluray` -ldl" \
 			--prefix=/; \
 		$(MAKE); \
 		make install DESTDIR=$(PKGPREFIX)

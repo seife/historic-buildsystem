@@ -286,3 +286,4 @@ LIBSIGCPP_VER=$(LIBSIGCPP_MAJOR).$(LIBSIGCPP_MINOR).$(LIBSIGCPP_MICRO)
 #djmount: mount MediaServers content as a Linux filesystem 
 DJMOUNT_VER=0.71
 
+LIBBLURAY_VER = 0.5.0
