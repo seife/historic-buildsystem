@@ -156,6 +156,7 @@ addon-drivers-pkg: tdkernel |$(HOSTPREFIX)/bin/opkg-module-deps.sh
 		cp -a $(SOURCE_MODULE)/kernel/* ./; \
 		rm -fr drivers/usb/host drivers/usb/storage fs/autofs4 # is in td-module-pkg and autofs
 	depmod -n -ae -F $(BUILD_TMP)/linux-2.6.12/System.map -b $(PKGPREFIX) $(KVERSION_FULL) 2>&1 >/dev/null \
+		| grep -v "could not open" \
 		| grep WARNING; test $$? != 0 # invert return code
 	cp -a $(CONTROL_DIR)/addon-drivers $(BUILD_TMP)
 	opkg-module-deps.sh $(PKGPREFIX) $(BUILD_TMP)/addon-drivers/control
