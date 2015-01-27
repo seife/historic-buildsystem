@@ -133,7 +133,12 @@ $(K_GCC_PATH)/powerpc-405-linux-gnu-gcc: | $(ARCHIVE)/crosstool-0.43.tar.gz
 	tar -C $(BUILD_TMP) -xzf $(ARCHIVE)/crosstool-0.43.tar.gz
 	cp $(PATCHES)/glibc-2.3.3-allow-gcc-4.0-configure.patch $(BUILD_TMP)/crosstool-0.43/patches/glibc-2.3.2
 	cp $(PATCHES)/glibc-2.3.6-new_make.patch                $(BUILD_TMP)/crosstool-0.43/patches/glibc-2.3.2
-	set -e; unset CONFIG_SITE LD_LIBRARY_PATH; cd $(BUILD_TMP)/crosstool-0.43; \
+	set -e; unset CONFIG_SITE LD_LIBRARY_PATH; \
+		if [ x`make --version | awk '/^GNU Make/{print int($$3)}'` != x3 ]; then \
+			make $(BUILD_TMP)/bin/gmake; \
+			export PATH=$(BUILD_TMP)/bin:$$PATH; \
+		fi; \
+		cd $(BUILD_TMP)/crosstool-0.43; \
 		NUM_CPUS=$$(expr `getconf _NPROCESSORS_ONLN` \* 2); \
 		MEM_512M=$$(awk '/MemTotal/ {M=int($$2/1024/512); print M==0?1:M}' /proc/meminfo); \
 		test $$NUM_CPUS -gt $$MEM_512M && NUM_CPUS=$$MEM_512M; \
