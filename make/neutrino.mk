@@ -55,6 +55,7 @@ NEUTRINO_DEPS2 += $(TARGETPREFIX)/bin/fbshot
 # N_LDFLAGS  = -L$(TARGETPREFIX)/lib -lcurl -lssl -lcrypto -ldl
 N_LDFLAGS =
 N_LDFLAGS += -Wl,-rpath-link,$(TARGETLIB)
+N_LDFLAGS += -L$(TARGETLIB)
 
 # finally we can build outside of the source directory
 N_OBJDIR = $(BUILD_TMP)/$(FLAVOUR)
